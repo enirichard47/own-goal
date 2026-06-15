@@ -1,0 +1,20 @@
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary output
+*.log
+*.tmp
+*.temp
+
+# Dependency/build folders
+node_modules/
+dist/
+build/
+
+# Local database config (crucial - do not commit to GitHub)
+game/config.js
+game/test-insert.js
+game/test-various.js

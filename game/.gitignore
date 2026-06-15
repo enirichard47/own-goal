@@ -1,0 +1,18 @@
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary output
+*.log
+*.tmp
+*.temp
+
+# Dependency/build folders if the project is extended later
+node_modules/
+dist/
+build/
+
+# Local database configuration
+config.js

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Own Goal $OG | Arcade Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style_v2.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- LAUNCH PAGE -->
+    <div id="launchPage">
+        <div class="launch-background">
+            <div class="particles"></div>
+        </div>
+        
+        <div class="launch-content">
+            <div class="logo-container">
+                <div class="launch-hero">
+                    <div class="hero-goal-post"></div>
+                    <img src="resources/ball.png" alt="ball" class="hero-ball">
+                    <img src="resources/player_User.png" alt="Own Goal Striker" class="hero-player">
+                    <div class="hero-label">OWN GOAL!</div>
+                </div>
+                <h1>Own Goal Arcade</h1>
+                <p class="subtitle">The Worse He Plays, The Higher We Go</p>
+                <div class="title-line"></div>
+            </div>
+            
+            <div class="launch-actions" style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+                <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; width:100%;">
+                    <button id="enterBtn" class="launch-button" style="margin-bottom:0;">
+                        <span class="button-text">PLAY NOW</span>
+                        <i class="fas fa-play"></i>
+                        <div class="button-glow"></div>
+                    </button>
+                    <a href="../index.html" class="launch-button btn-secondary" style="background:#eaeaea; color:black; text-decoration:none; margin-bottom:0; display:inline-flex; align-items:center; justify-content:center;">
+                        <span class="button-text" style="color:black; margin-right:15px;">WEBSITE</span>
+                        <i class="fas fa-home"></i>
+                    </a>
+                </div>
+                
+                <div class="launch-features">
+                    <button class="feature" id="featureLeaderboard">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard</span>
+                    </button>
+                    <button class="feature" id="featureSettings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </button>
+                    <button class="feature" id="featureControls">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Controls</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="launch-footer">
+                <p><i class="fas fa-keyboard"></i> Press <kbd>ENTER</kbd> to start • <kbd>SPACE</kbd> for special shot</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAYER AUTHENTICATION PAGE -->
+    <div id="authPage" style="display:none;">
+      <div class="auth-background">
+        <div class="field-pattern"></div>
+      </div>
+      
+      <div class="auth-container">
+        <div class="logo-container">
+          <div class="logo-circle">
+            <i class="fas fa-futbol"></i>
+          </div>
+          <h1>OWN GOAL $OG</h1>
+          <p class="subtitle">PLAYER SELECT</p>
+          <div class="title-line"></div>
+        </div>
+
+        <!-- Option Selector -->
+        <div class="auth-options" id="authOptions">
+          <button class="authOptionButton" id="btnStartNewOpt">
+            <span class="button-title">Start New Player</span>
+            <span class="button-subtitle">Register telegram handle & password</span>
+          </button>
+          
+          <button class="authOptionButton" id="btnContinueOpt">
+            <span class="button-title">Continue Existing Player</span>
+            <span class="button-subtitle">Log in to load your high score</span>
+          </button>
+        </div>
+
+        <!-- Start New Player Form -->
+        <form class="auth-form" id="startNewForm" style="display:none;" onsubmit="return false;">
+          <h3><i class="fas fa-user-plus"></i> START NEW PLAYER</h3>
+          <div class="input-group">
+            <label for="newUsername">Telegram Username</label>
+            <input type="text" id="newUsername" placeholder="@telegram_username" required>
+          </div>
+          <div class="input-group">
+            <label for="newPassword">Create Password</label>
+            <input type="password" id="newPassword" placeholder="••••••••" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="panel-button" id="btnSubmitNewPlayer">Create Player</button>
+            <button type="button" class="panel-button btn-secondary btnBackToOptions">Back</button>
+          </div>
+          <div class="auth-error" id="newPlayerError"></div>
+        </form>
+
+        <!-- Continue Existing Player Form -->
+        <form class="auth-form" id="continueForm" style="display:none;" onsubmit="return false;">
+          <h3><i class="fas fa-sign-in-alt"></i> CONTINUE EXISTING PLAYER</h3>
+          <div class="input-group">
+            <label for="existUsername">Telegram Username</label>
+            <input type="text" id="existUsername" placeholder="@telegram_username" required>
+          </div>
+          <div class="input-group">
+            <label for="existPassword">Password</label>
+            <input type="password" id="existPassword" placeholder="••••••••" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="panel-button" id="btnSubmitExistPlayer">Log In</button>
+            <button type="button" class="panel-button btn-secondary btnBackToOptions">Back</button>
+          </div>
+          <div class="auth-error" id="existPlayerError"></div>
+        </form>
+      </div>
+    </div>
+
+<!-- HOME MENU -->
+<div id="homeMenu">
+  <div class="menu-background">
+    <div class="menu-overlay"></div>
+    <div class="field-pattern"></div>
+  </div>
+  
+  <div class="menu-container">
+    <header class="menu-header">
+      <div class="menu-logo">
+        <i class="fas fa-futbol"></i>
+        <span>$OG</span>
+      </div>
+      <div class="menu-player" style="display:flex; align-items:center; gap:12px;">
+        <span id="loggedInUsername" style="font-family:'Permanent Marker', cursive; font-size: 1.2rem; color: var(--pepe-yellow, #ff7a00);">@username</span>
+        <button id="logoutBtn" class="panel-button" style="padding: 6px 12px; font-size: 0.9rem; background: var(--pepe-orange, #e05300); margin:0;">Logout</button>
+        <a href="../index.html" class="panel-button btn-secondary" style="padding: 6px 12px; font-size: 0.9rem; margin:0; text-decoration:none; display:inline-block; color:black;">Website</a>
+      </div>
+    </header>
+    
+    <main class="menu-content">
+      <h2 class="menu-title">OWN GOAL STADIUM</h2>
+      
+      <div class="menu-buttons">
+        <button class="menuButton" id="startGameBtn">
+          <div class="button-icon">
+            <i class="fas fa-play"></i>
+          </div>
+          <div class="button-content">
+            <span class="button-title">Start Blunder Match</span>
+            <span class="button-subtitle">Tripping on the pitch</span>
+          </div>
+          <div class="button-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </button>
+        
+        <button class="menuButton" id="settingsBtn">
+          <div class="button-icon">
+            <i class="fas fa-sliders-h"></i>
+          </div>
+          <div class="button-content">
+            <span class="button-title">Game Settings</span>
+            <span class="button-subtitle">Audio & volume</span>
+          </div>
+          <div class="button-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </button>
+
+        <button class="menuButton" id="characterBtn">
+          <div class="button-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="button-content">
+            <span class="button-title">Select Characters</span>
+            <span class="button-subtitle">Select your blunder squad</span>
+          </div>
+          <div class="button-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </button>
+        
+        <button class="menuButton" id="scoresBtn">
+          <div class="button-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="button-content">
+            <span class="button-title">Own Goal Leaderboard</span>
+            <span class="button-subtitle">Top Blunderers</span>
+          </div>
+          <div class="button-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </button>
+        
+        <button class="menuButton" id="creditsBtn">
+          <div class="button-icon">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div class="button-content">
+            <span class="button-title">Own Goal Lore</span>
+            <span class="button-subtitle">About $OG token</span>
+          </div>
+          <div class="button-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </button>
+      </div>
+      
+      <div class="menu-stats">
+        <div class="stat-box">
+          <i class="fas fa-history"></i>
+          <div class="stat-info">
+            <span class="stat-value">00:00</span>
+            <span class="stat-label">Play Time</span>
+          </div>
+        </div>
+        <div class="stat-box">
+          <i class="fas fa-futbol"></i>
+          <div class="stat-info">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Best Score</span>
+          </div>
+        </div>
+        <div class="stat-box">
+          <i class="fas fa-trophy"></i>
+          <div class="stat-info">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Wins</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- CHARACTER SELECTION PANEL -->
+<div id="characterPanel" style="display:none;">
+  <div class="panel-overlay"></div>
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2><i class="fas fa-users"></i> Select Characters</h2>
+      <button id="closeCharacter" class="panel-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="panel-body">
+      <div class="character-section">
+        <h3><i class="fas fa-user"></i> Select Your Player</h3>
+        <div class="character-grid">
+          <div class="character-card selected" data-player="0">
+            <img src="resources/player_User.png" alt="Own Goal Striker">
+            <span class="character-name">Own Goal Striker</span>
+          </div>
+          <div class="character-card" data-player="1">
+            <img src="resources/player4.png" alt="Degen Referee">
+            <span class="character-name">Degen Referee</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="character-section">
+        <h3><i class="fas fa-robot"></i> Select Opponent Goalie</h3>
+        <div class="character-grid">
+          <div class="character-card selected" data-opponent="0">
+            <img src="resources/player_Opponent.png" alt="Butterfly Goalie">
+            <span class="character-name">Butterfly Goalie</span>
+          </div>
+          <div class="character-card" data-opponent="1">
+            <img src="resources/player3.png" alt="Crying Goalie">
+            <span class="character-name">Crying Goalie</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel-footer">
+      <button class="panel-button" id="saveCharacters">Save Selection</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settingsPanel" style="display:none;">
+  <div class="panel-overlay"></div>
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2><i class="fas fa-cog"></i> Settings</h2>
+      <button id="closeSettings" class="panel-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="panel-body">
+      <div class="setting-group">
+        <h3><i class="fas fa-music"></i> Audio Settings</h3>
+        <label class="setting-label">Background Music:</label>
+        <div class="select-container">
+          <select id="musicSelect">
+            <option value="football-412586.mp3">Match Music</option>
+            <option value="menu_music.mp3">Menu Music</option>
+            <option value="launch_music.mp3">Launch Music</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
+        </div>
+        
+        <label class="setting-label">Music Volume:</label>
+        <input type="range" id="musicVolume" min="0" max="100" value="50" class="slider">
+        
+        <label class="setting-label">Sound Effects Volume:</label>
+        <input type="range" id="sfxVolume" min="0" max="100" value="70" class="slider">
+      </div>
+      
+      <div class="setting-group" style="margin-top: 20px; border-top: 3px dashed var(--comic-black); padding-top: 20px;">
+        <h3><i class="fas fa-database"></i> Database Settings</h3>
+        <label class="setting-label">Supabase URL:</label>
+        <input type="text" id="dbUrlInput" placeholder="https://your-project.supabase.co" style="width: 100%; padding: 10px; border: 3px solid var(--comic-black); border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-family: 'Comic Neue', sans-serif;">
+        
+        <label class="setting-label">Supabase Anon Key:</label>
+        <input type="password" id="dbKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="width: 100%; padding: 10px; border: 3px solid var(--comic-black); border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-family: 'Comic Neue', sans-serif;">
+        <p style="font-size: 11px; color: rgba(0, 0, 0, 0.6); font-weight: bold; margin-top: -5px;"><i class="fas fa-lock"></i> Saved locally in your browser. Will not be committed to Git.</p>
+      </div>
+    </div>
+    
+    <div class="panel-footer">
+      <button class="panel-button" id="saveSettingsBtn">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIGH SCORES -->
+<div id="highScoresPanel" style="display:none;">
+  <div class="panel-overlay"></div>
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2><i class="fas fa-trophy"></i> Own Goal Leaderboard</h2>
+      <button id="closeScores" class="panel-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="panel-body">
+      <!-- Header row for the leaderboard -->
+      <div class="leaderboard-header-row" style="display:grid; grid-template-columns: 2.5fr 1fr 1fr 1.2fr; gap: 10px; padding:8px 15px; font-weight:bold; font-family:'Bangers'; font-size:1.1rem; letter-spacing:1px; border-bottom:3px solid var(--comic-black); color: var(--pepe-yellow);">
+        <span>PLAYER</span>
+        <span style="text-align:right;">SCORE</span>
+        <span style="text-align:right;">WINS</span>
+        <span style="text-align:right;">PLAY TIME</span>
+      </div>
+      <ol id="highScoresList" class="scores-list">
+        <!-- Scores will be populated from Supabase -->
+      </ol>
+    </div>
+    
+    <div class="panel-footer">
+      <button class="panel-button" id="closeScoresBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="gameContainer" style="display:none;">
+  <div class="game-background">
+    <div class="stadium-lights-game"></div>
+    <div class="crowd-overlay"></div>
+  </div>
+  
+  <div class="game-wrapper">
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    
+    <!-- Scoreboard -->
+    <div id="scoreboard" class="modern-scoreboard">
+      <div class="teamScore player-team">
+        <div class="team-badge">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="team-info">
+          <div class="teamName" id="hudPlayerName">PLAYER</div>
+          <div class="score" id="playerScore">0</div>
+        </div>
+        <div class="team-possession">
+          <div class="possession-bar" style="width: 45%"></div>
+        </div>
+      </div>
+      
+      <div class="matchInfo">
+        <div class="time-container">
+          <div class="time-label">TIME</div>
+          <div class="time" id="matchTime">03:00</div>
+          <div class="time-progress">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <!-- In-game Pause/Back button -->
+        <button id="hudPauseBtn" class="hud-pause-btn" aria-label="Pause Game">
+          <i class="fas fa-pause"></i>
+        </button>
+        <!-- Special mini: hidden on desktop, shown on mobile landscape via CSS -->
+        <div class="special-mini" style="display:none;">
+          <i class="fas fa-bolt"></i>
+          <span id="specialShotsMini">3</span>
+        </div>
+      </div>
+      
+      <div class="teamScore opponent-team">
+        <div class="team-possession">
+          <div class="possession-bar" style="width: 55%"></div>
+        </div>
+        <div class="team-info">
+          <div class="teamName">OPPONENT</div>
+          <div class="score" id="opponentScore">0</div>
+        </div>
+        <div class="team-badge">
+          <i class="fas fa-robot"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special shots HUD — always visible top-right -->
+    <div id="specialHUD" class="special-hud">
+      <i class="fas fa-bolt"></i>
+      <div class="special-hud-body">
+        <div class="special-hud-label">SPECIAL</div>
+        <div class="special-hud-count">
+          <strong id="specialShots" style="transition:color .3s,transform .3s;display:inline-block;">3</strong><span>/3</span>
+        </div>
+        <div class="reload-bar-bg">
+          <div id="reloadBar" class="reload-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="highScoreCard" class="high-score-display">
+      <i class="fas fa-crown"></i>
+      <div class="high-score-content">
+        <span class="high-score-label">HIGH SCORE</span>
+        <span class="high-score-value"><span id="highScoreDisplay">0</span></span>
+      </div>
+      <div class="high-score-glow"></div>
+    </div>
+    
+    <div class="game-controls">
+      <div class="control-item">
+        <kbd>←</kbd><kbd>→</kbd>
+        <span>Move</span>
+      </div>
+      <div class="control-item">
+        <kbd>↑</kbd>
+        <span>Jump</span>
+      </div>
+      <div class="control-item">
+        <kbd>D</kbd>
+        <span>Kick</span>
+      </div>
+      <div class="control-item">
+        <kbd>SPACE</kbd>
+        <span>Special</span>
+      </div>
+      <div class="control-item">
+        <kbd>ESC</kbd>
+        <span>Pause</span>
+      </div>
+    </div>
+
+    <!-- Mobile touch controls (shown on small screens / touch devices) -->
+    <div id="mobileControls" class="mobile-controls">
+      <div class="mob-left">
+        <button class="mob-btn" id="mobLeft" aria-label="Move Left">◀</button>
+        <button class="mob-btn" id="mobRight" aria-label="Move Right">▶</button>
+      </div>
+      <div class="mob-right">
+        <button class="mob-btn mob-jump" id="mobJump" aria-label="Jump">▲</button>
+        <button class="mob-btn mob-kick" id="mobKick" aria-label="Kick">KICK</button>
+        <button class="mob-btn mob-special" id="mobSpecial" aria-label="Special shot">⚡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE PANEL -->
+<div id="pausePanel" style="display:none;">
+  <div class="pause-bg"></div>
+  <div class="pause-content">
+    <h1>Paused</h1>
+    <div class="pause-buttons">
+      <button id="resumeBtn">Resume</button>
+      <button id="restartBtn">Restart</button>
+      <button id="pauseMainMenuBtn">Main Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MATCH OVER PANEL -->
+<div id="matchOverPanel" style="display:none;">
+  <div class="match-over-bg"></div>
+  <div class="match-over-content">
+    <h1>Match Over</h1>
+    <div class="scores">
+      <div class="player-score">
+        <h2>Player</h2>
+        <span id="finalPlayerScore">0</span>
+      </div>
+      <div class="opponent-score">
+        <h2>Opponent</h2>
+        <span id="finalOpponentScore">0</span>
+      </div>
+    </div>
+    <div class="buttons">
+      <button id="replayBtn">Replay</button>
+      <button id="mainMenuBtn">Main Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS PANEL -->
+<div id="controlsPanel" style="display:none;">
+  <div class="panel-overlay"></div>
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2><i class="fas fa-gamepad"></i> Controls</h2>
+      <button id="closeControlsPanel" class="panel-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="panel-body">
+      <table class="controls-table">
+        <tr><td class="ctrl-key"><kbd>← →</kbd></td><td class="ctrl-desc">Move left / right</td></tr>
+        <tr><td class="ctrl-key"><kbd>↑</kbd></td><td class="ctrl-desc">Jump</td></tr>
+        <tr><td class="ctrl-key"><kbd>D</kbd></td><td class="ctrl-desc">Kick the ball</td></tr>
+        <tr><td class="ctrl-key"><kbd>SPACE</kbd></td><td class="ctrl-desc">Special shot (aimed at goal)</td></tr>
+        <tr><td class="ctrl-key"><kbd>ESC</kbd></td><td class="ctrl-desc">Pause / Resume</td></tr>
+        <tr><td class="ctrl-key"><kbd>ENTER</kbd></td><td class="ctrl-desc">Start / Restart match</td></tr>
+      </table>
+      <p class="controls-tip"><i class="fas fa-bolt" style="color:#ff7a00;"></i> You get <strong>3 special shots</strong> per half. Score against yourself for maximum chaos!</p>
+    </div>
+    <div class="panel-footer">
+      <button class="panel-button" id="closeControlsPanelFooter" onclick="document.getElementById('controlsPanel').style.display='none'">Got it!</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="game_v2.js"></script>
+</body>
+</html>
