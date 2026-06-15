@@ -342,10 +342,12 @@ function sanitizeUsername(username) {
 }
 
 // Register Player against Supabase
-// Register Player against Supabase
 async function registerPlayer(username, password) {
     const errorDiv = document.getElementById('newPlayerError');
     errorDiv.textContent = "";
+    
+    const submitBtn = document.getElementById('btnSubmitNewPlayer');
+    const originalText = submitBtn ? submitBtn.innerHTML : "Create Player";
     
     const cleanUsername = sanitizeUsername(username);
     if (cleanUsername.length < 3) {
@@ -356,6 +358,18 @@ async function registerPlayer(username, password) {
         errorDiv.textContent = "Password must be at least 4 characters.";
         return;
     }
+    
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    }
+    
+    const restoreBtn = () => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    };
     
     if (!supabaseClient) {
         errorDiv.textContent = "Supabase offline. Creating local session...";
@@ -368,6 +382,7 @@ async function registerPlayer(username, password) {
             highScore = 0;
             totalWins = 0;
             totalPlayTime = 0;
+            restoreBtn();
             enterMainMenu(cleanUsername, 0, 0, 0);
         }, 1000);
         return;
@@ -384,6 +399,7 @@ async function registerPlayer(username, password) {
         
         if (data) {
             errorDiv.textContent = "Username already taken! Try Continue Existing.";
+            restoreBtn();
             return;
         }
         
@@ -403,10 +419,12 @@ async function registerPlayer(username, password) {
         totalWins = 0;
         totalPlayTime = 0;
         
+        restoreBtn();
         enterMainMenu(cleanUsername, 0, 0, 0);
     } catch (err) {
         console.error(err);
         errorDiv.textContent = "Failed to create player: " + err.message;
+        restoreBtn();
     }
 }
 
@@ -415,7 +433,22 @@ async function loginPlayer(username, password, isAutoLogin = false) {
     const errorDiv = isAutoLogin ? null : document.getElementById('existPlayerError');
     if (errorDiv) errorDiv.textContent = "";
     
+    const submitBtn = isAutoLogin ? null : document.getElementById('btnSubmitExistPlayer');
+    const originalText = submitBtn ? submitBtn.innerHTML : "Log In";
+    
     const cleanUsername = sanitizeUsername(username);
+    
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging In...';
+    }
+    
+    const restoreBtn = () => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    };
     
     if (!supabaseClient) {
         const savedUser = safeStorage.getItem('own_goal_username');
@@ -427,11 +460,14 @@ async function loginPlayer(username, password, isAutoLogin = false) {
             highScore = savedScore;
             totalWins = savedWins;
             totalPlayTime = savedPlayTime;
+            restoreBtn();
             enterMainMenu(cleanUsername, savedScore, savedWins, savedPlayTime);
         } else if (isAutoLogin) {
+            restoreBtn();
             authPage.style.display = 'flex';
         } else {
             errorDiv.textContent = "Credentials do not match local offline session.";
+            restoreBtn();
         }
         return;
     }
@@ -453,6 +489,7 @@ async function loginPlayer(username, password, isAutoLogin = false) {
             } else {
                 errorDiv.textContent = "Invalid username or password.";
             }
+            restoreBtn();
             return;
         }
         
@@ -469,6 +506,7 @@ async function loginPlayer(username, password, isAutoLogin = false) {
         totalWins = dbWins;
         totalPlayTime = dbPlayTime;
         
+        restoreBtn();
         enterMainMenu(cleanUsername, data.high_score, dbWins, dbPlayTime);
     } catch (err) {
         console.error(err);
@@ -477,6 +515,7 @@ async function loginPlayer(username, password, isAutoLogin = false) {
         } else {
             errorDiv.textContent = "Login failed: " + err.message;
         }
+        restoreBtn();
     }
 }
 
@@ -526,6 +565,13 @@ document.getElementById('btnContinueOpt').addEventListener('click', () => {
     selectSound.play();
     authOptions.style.display = 'none';
     continueForm.style.display = 'flex';
+});
+
+document.getElementById('btnBackToLaunch').addEventListener('click', () => {
+    selectSound.play();
+    authPage.style.display = 'none';
+    launchPage.style.display = 'flex';
+    launchPage.style.opacity = 1;
 });
 
 document.querySelectorAll('.btnBackToOptions').forEach(btn => {
@@ -1000,7 +1046,7 @@ function updateOpponent() {
     if (kickoff) return;
     
     const homeX = WIDTH - 300;
-    const speedFactor = difficulty === "easy" ? 0.35 : difficulty === "medium" ? 0.55 : 0.85;
+    const speedFactor = difficulty === "easy" ? 0.35 : difficulty === "medium" ? 0.70 : 0.85;
 
     let isMovingLeft = false;
     let isMovingRight = false;
@@ -1029,7 +1075,7 @@ function updateOpponent() {
         }
 
         if (!opponent.jump && ball.y < HEIGHT - 80 && ball.x > opponent.x - 70 && ball.x < opponent.x + opponent.w + 70) {
-            if (Math.random() < 0.4) {
+            if (Math.random() < 0.55) {
                 opponent.dy = -17.5 - Math.random() * 2;
                 opponent.jump = true;
             }
@@ -1038,7 +1084,7 @@ function updateOpponent() {
         const nearGoal = ball.x < WIDTH / 2 && ball.lastTouch !== "opponent";
         const missedBall = ball.x > opponent.x + 70 && ball.lastTouch === "player";
 
-        if (!opponent.shooting && (nearGoal || missedBall) && Math.random() < 0.02) {
+        if (!opponent.shooting && (nearGoal || missedBall) && Math.random() < 0.035) {
             opponent.shooting = true;
             opponent.kickTimer = 16;
             opponent.animFrame = 0;
