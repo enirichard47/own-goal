@@ -613,6 +613,18 @@ document.getElementById('continueForm').addEventListener('submit', (e) => {
 
 document.getElementById('enterBtn').addEventListener('click', () => {
     selectSound.play();
+    
+    // Automatically request fullscreen on user interaction
+    try {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+        }
+    } catch (err) {
+        console.warn("Fullscreen request failed:", err);
+    }
+    
     launchPage.style.opacity = 0;
     setTimeout(() => {
         launchPage.style.display = 'none';
@@ -626,6 +638,46 @@ document.getElementById('enterBtn').addEventListener('click', () => {
         }
     }, 500);
 });
+
+// Fullscreen Toggle in settings
+const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+if (btnToggleFullscreen) {
+    btnToggleFullscreen.addEventListener('click', () => {
+        selectSound.play();
+        try {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        } catch (err) {
+            console.error("Fullscreen toggle failed:", err);
+        }
+    });
+}
+
+// Update fullscreen button text dynamically
+const onFullscreenChange = () => {
+    const btn = document.getElementById('btnToggleFullscreen');
+    if (btn) {
+        const isFS = document.fullscreenElement || document.webkitFullscreenElement;
+        if (isFS) {
+            btn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+        } else {
+            btn.innerHTML = '<i class="fas fa-expand"></i> Enter Fullscreen';
+        }
+    }
+};
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
 document.getElementById('startGameBtn').addEventListener('click', () => {
     selectSound.play();
