@@ -1863,12 +1863,12 @@ canvas {
   /* Canvas: explicit height fills the padded content strip;
      aspect-ratio drives the width so 16:9 is preserved */
   canvas {
-    height: calc(100dvw - 138px) !important;  /* 100dvw = container height = portrait width */
-    height: calc(100vw - 138px) !important;
-    width: auto !important;
+    height: calc(100dvw - 138px);  /* 100dvw = container height = portrait width */
+    height: calc(100vw - 138px);
+    width: auto;
     aspect-ratio: 16 / 9 !important;
-    max-width: 100dvh !important;   /* 100dvh = container width = portrait height */
-    max-width: 100vh !important;
+    max-width: 100dvh;   /* 100dvh = container width = portrait height */
+    max-width: 100vh;
     flex-shrink: 0 !important;
     border: none !important;
     box-shadow: none !important;
@@ -2002,8 +2002,8 @@ canvas {
   canvas {
     /* JS provides precise px; CSS is the fallback */
     width: auto;
-    height: calc(100dvh - 138px) !important;
-    height: calc(100vh - 138px) !important;
+    height: calc(100dvh - 138px);
+    height: calc(100vh - 138px);
     aspect-ratio: 16 / 9;
     max-width: 100%;
     border-left: none; border-right: none;
